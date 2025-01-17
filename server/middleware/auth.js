@@ -2,7 +2,7 @@ import jwt from   "jsonwebtoken"
 
 const auth = async(request, response,next)=> {
     try{
-        const token = request.cookies.acessToken || request?.header?.authorization?.Split(" ")[1]  // bear token
+        const token = request.cookies.acessToken || request?.headers?.authorization?.Split(" ")[1]  // bear token
     
         if(!token){
             return  response.status(401).json({

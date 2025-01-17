@@ -164,6 +164,10 @@ export async function loginController(request, response) {
         const acesstoken = await generatedAcessToken(user._id)
         const refreshtoken = await genertedRefreshToken(user._id)
 
+        const updateUser = await UserModel.findByIdAndUpdate(user?._id,{
+            last_login_update : new Date()
+        })
+
         const  cookiesOption = {
             httpOnly : true,
             secure : true,
@@ -252,6 +256,8 @@ export async  function  uploadAvatar(request, response){
 
         return  response.json({
             message :  "upload profile",
+            sucess : true,
+            error : false,
             data :  {
                 _id: userId,
                 avatar : upload.url
@@ -292,7 +298,7 @@ export async function updateUserDetails(request, response){
         })
 
         return response.json({
-            message : "updated user successfully",
+            message : "updated successfully",
             error : false,
             sucess : true,
             data : updateUser
@@ -484,7 +490,7 @@ export async function resetpassword(request,response){
 // refresh token
 export async  function refreshToken(request,response){
     try {
-        const refreshToken = request.cookies.refreshToken || request?.header?.authorization?.split()[1] //  beear token
+        const refreshToken = request.cookies.refreshToken || request?.headers?.authorization?.split()[1] //  beear token
 
         if(!refreshToken){
             return response.status(401).json({
@@ -536,4 +542,34 @@ export async  function refreshToken(request,response){
             sucess : false
         })
     }
+}
+
+// get  login user Details 
+export async function userDetails(request,response) {
+    try {
+
+        const userId = request.userId
+
+        console.log(userId)
+
+        const user = await UserModel.findById(userId).select('-password -refresh_token')
+
+        return response.json({
+            message : 'user details',
+            data : user,
+            error : false,
+            sucess : true
+
+        })
+
+    } catch (error) {
+        return response.status(500).json({
+            message : "something is wrong",
+            error : true,
+            sucess : false
+
+        })
+
+    }
+    
 }
